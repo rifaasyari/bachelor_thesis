@@ -24,13 +24,9 @@ function [P_l] = psp(size, l, L)
 %       Siena-Tuscany, Italy, 2009, pp.575 - 579
 %
 %   See also CNBO
-
-    if l < 2
-        error('l must be greater than 1');
-    elseif l > size
-        error('l must be less than or equal to %d', size);
-    end
     
     s = floor((l - 2) * size / L);
     P_l = [eye(s) zeros(s,size - s); zeros(size - s,s) rot90(eye(size - s))];
+    
+    addflops(2 + flops_div() + 3);
 end

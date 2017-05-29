@@ -25,7 +25,8 @@ function [H_LR, T] = clll(H, delta)
     squared_norms = zeros(1, n);  % Denoted with calligraphic H in [1]. The 
                                   % squared norms of the orthoganal vectors   
     for k = 1:n
-        squared_norms(k) = dot(H(:,k), H(:,k));
+        squared_norms(k) = dot(H(:,k), H(:,k)); addflops(6 * flops_mul(H(:,k), ... 
+            H(:,k)));
     end
     
     % Modified Gram-Schmidt orthogonalization (GSO) procdure to compute the
@@ -34,12 +35,16 @@ function [H_LR, T] = clll(H, delta)
     for k = 1:n
         for l = k+1:n 
             inner_prod_kl = dot(H(:,l), H(:,k));
-            sub_term = sum(conj(normed_prods(k,1:k-1)) * ...
-                normed_prods(l,1:k-1) * squared_norms(1:k-1));
+            sub_term = sum(conj(normed_prods(k,1:k-1)) .* ...
+                normed_prods(l,1:k-1) .* squared_norms(1:k-1));
             normed_prods(l,k) = (1 / squared_norms(k)) * ... 
                 (inner_prod_kl - sub_term);
             squared_norms(l) = squared_norms(l) - ... 
                 abs(normed_prods(l, k))^2 * squared_norms(k);
+            
+            addflops(6 * flops_mul(H(:,l), H(:,k)) + 12 * (k-1) + ... 
+                flops_row_sum(1, k-1) + flops_div() + 4 + flops_abs() + ... 
+                flops_pow(2) + 2);
         end
     end
     
@@ -50,12 +55,16 @@ function [H_LR, T] = clll(H, delta)
                 abs(imag(normed_prods(k,k-1))) > 1/2
             % First condition (5) for a CLLL-reduced complex lattice is  
             % violated -> Reduce vector size 
+            addflops(2 * flops_abs() + 4);
+            
             [H, T, normed_prods] = size_reduce(H, T, normed_prods, k, k-1);
         end
         if squared_norms(k) < (delta - abs(normed_prods(k,k-1))^2) * ... 
                 squared_norms(k-1)
             % Second condition (6) for a CLLL-reduced complex lattice is
             % violated -> Swap vectors and update ((7) - (15) in [1])
+            addflops(3 + flops_abs() + flops_pow(2) + 1);
+            
             H(:,[k,k-1]) = H(:,[k-1,k]);  % (7) and (8)
             H_k = squared_norms(k);
             H_k_1 = squared_norms(k-1);
@@ -65,6 +74,10 @@ function [H_LR, T] = clll(H, delta)
                 (H_k_1 / squared_norms(k-1));  % (10)
             squared_norms(k) = H_k_1 - abs(normed_prods(k,k-1))^2 * ... 
                 squared_norms(k-1);  % (11)
+            
+            addflops(1 + flops_abs() + flops_pow(2) + 1 + flops_div() + ... 
+                2 + 1 + flops_abs() + flops_pow(2) + 1);
+            
             for l = k+1:n
                 tmp = normed_prods(l,k-1);
                 normed_prods(l,k-1) = normed_prods(l,k-1) * ... 
@@ -73,6 +86,8 @@ function [H_LR, T] = clll(H, delta)
                 normed_prods(l,k) = tmp - normed_prods(l,k) * ... 
                     normed_prods(k, k-1);  % (13)
             end
+            addflops((n - (k+1)) * 18);
+            
             for l = 1:k-2
                 normed_prods([k-1,k],l) = normed_prods([k,k-1],l);  % (14)
                 % and (15)
@@ -85,6 +100,8 @@ function [H_LR, T] = clll(H, delta)
                         abs(imag(normed_prods(k,l))) > 1/2
                     % First condition (5) for a CLLL-reduced complex
                     % lattice is violated -> Reduce vector size
+                    addflops(2 * flops_abs() + 4);
+                    
                     [H, T, normed_prods] = ... 
                         size_reduce(H, T, normed_prods, k, l);
                 end

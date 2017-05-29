@@ -21,8 +21,11 @@ function [estimate] = shifting_scaling(z, n, kappa, T_inv)
 %
 %   See also MR_LR_SIC
 
-    cmpl_lattice_offset = kappa * T_inv(n,:) * ones(length(z),1);
+    cmpl_lattice_offset = kappa * T_inv(n,:) * ones(length(T_inv(n,:)), 1);
     estimate = 2 * round((z(1) - cmpl_lattice_offset)/2) + ... 
         cmpl_lattice_offset;
+    
+    addflops(2 * flops_mul(1, length(T_inv(n,:)), 1) + 5 + ... 
+        flops_div() + 2);
 
 end

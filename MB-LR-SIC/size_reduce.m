@@ -10,7 +10,12 @@ function [H, T, normed_prods] = size_reduce(H, T, normed_prods, k, l)
 
     c = round(normed_prods(k, l));
     H(:,k) = H(:,k) - c * H(:,l);
-    T(:,k) = T(:,k) - c * U(:,l);
+    T(:,k) = T(:,k) - c * T(:,l);
+    
+    addflops((2 + c*6) * rows(H) + (2 + c*6) * rows(T));
+    
     for m = 1:l
         normed_prods(k,m) = normed_prods(k,m) - c * normed_prods(l,m);
     end
+    
+    addflops(l*8);

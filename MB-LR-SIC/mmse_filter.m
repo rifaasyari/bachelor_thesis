@@ -20,4 +20,8 @@ function [W] = mmse_filter(H, signal_power, noise_power)
 
     alpha = noise_power / signal_power;  % noise-to-signal-power ratio
     W = H * inv((ctranspose(H) * H + alpha * eye(size(H, 2))));
+    
+    addflops(flops_div + 2 * flops_mul(rows(H), cols(H), cols(H)) + ...
+        flops_inv(cols(H)) + 6 * flops_mul(cols(H), rows(H), cols(H)) + ...
+        2 * cols(H)^2);
 end
