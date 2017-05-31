@@ -1,21 +1,28 @@
-function [s_estim] = ml_mimo(y, H, modulation)
+function [s_estim] = ml_mimo(y, H, constellation)
 % ML_MIMO Implements the ML detection for MIMO systems
 %   Input
 %       y: Received signal
 %       H: Channel gain matrix
-%       modulation: Used transmit modulation, e.g. M-QAM, QPSK, ...
+%       constellation: Used transmit constellation, e.g. [-3, -1, 1, 3], 
+%           [1, 1j, -1, -1j], ...
 %
 %   Output
 %       s_estim: Estimation of transmitted signal
 %
 %   See also MB_LR_SIC
 
-    N_t = size(H, 2);  % Number of transmit antennas of the system
+    N_t = cols(H);  % Number of transmit antennas of the system
     
-    % from: https://stackoverflow.com/questions/18591440/how-to-find-all-permutations-with-repetition-in-matlab
-    C = cell(N_t, 1);
-    [C{:}] = ngrid(modulation);
-    possible_signals = cellfun(@(modulation){modulation(:)}, C);
-    possible_signals = [possible_signals{:}];
-
+    % from: https://de.mathworks.com/matlabcentral/fileexchange/40546-n-permute-k
+    Possbl_s = npermutek(constellation, N_t)';  % Generate all possible sent 
+                                                % signals for ML detection
+                                               
+    addflops(flops_pow(K));
+    
+    Y = repmat(y, 1, cols(Possbl_s));
+    ml_criterion = dot(Y - H*Possbl_s);
+    
+    addflops();
+    
+    s_estim = Possbl_s(:, argmin(ml_criterion));
 end

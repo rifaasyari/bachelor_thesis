@@ -2,7 +2,7 @@ qpsk = [1*exp(0) 1*exp(pi/2 * 1j) 1*exp(pi * 1j) 1*exp(3*pi/2 * 1j)];
 % qpsk modulation on the unit circle
 
 antennas = 2:10;
-reps=100;  % Compute the detection 'reps' times and then take average of flops
+reps=500;  % Compute the detection 'reps' times and then take average of flops
 flops_mb_lr_sic = zeros(1, length(antennas));
 
 for n = 1:length(antennas)
