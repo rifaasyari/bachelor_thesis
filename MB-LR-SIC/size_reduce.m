@@ -1,4 +1,4 @@
-function [H, T, normed_prods] = size_reduce(H, T, normed_prods, k, l)
+function [H, T, mu] = size_reduce(H, T, mu, k, j)
 % SIZE_REDUCE Subroutine in CLLL reduction algorithm [1]. "[...] Aims to
 % make basis vectors shorter and closer to orthogonal" [1]. 
 % 
@@ -7,15 +7,17 @@ function [H, T, normed_prods] = size_reduce(H, T, normed_prods, k, l)
 %       Signal Processing, Vol. 57, No. 7, July 2009, pp. 2701 - 2710
 %
 %   See also CLLL
-
-    c = round(normed_prods(k, l));
-    H(:,k) = H(:,k) - c * H(:,l);
-    T(:,k) = T(:,k) - c * T(:,l);
     
-    addflops((2 + c*6) * rows(H) + (2 + c*6) * rows(T));
+    c = round(mu(k, j));
+    H(:,k) = H(:,k) - c * H(:,j);
+    T(:,k) = T(:,k) - c * T(:,j);
     
-    for m = 1:l
-        normed_prods(k,m) = normed_prods(k,m) - c * normed_prods(l,m);
+    addflops(2 * (rows(H) + rows(T)));
+    
+    for l = 1:j
+        mu(k,l) = mu(k,l) - c * mu(j,l);
     end
     
-    addflops(l*8);
+    addflops(l*2);
+    
+end
