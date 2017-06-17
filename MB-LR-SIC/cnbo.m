@@ -9,14 +9,15 @@ function [P] = cnbo(H)
 
     n = size(H,2);  % number of columns in H
     column_norms = zeros(1, n);
+    
     for k=1:length(column_norms)
         column_norms(k) = norm(H(:,k));  % Compute norms
         
-        addflops(flops_mul(H(:,k), H(:,k)) + flops_sqrt());
+        addflops(flops_mul(H(:,k)', H(:,k)) + flops_sqrt);
     end
     P = zeros(n, n); 
     for k=1:length(column_norms)
-        [argvalue, argmax] = max(column_norms);
+        [~, argmax] = max(column_norms);
         P(argmax, k) = 1;  % Permutate column k with column argmax
         column_norms(argmax) = 0;  % Ignore max_index for remaining 
                                    % iterations 
