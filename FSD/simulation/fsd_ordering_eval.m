@@ -110,4 +110,7 @@ if N_t == 2
     title(sprintf('$N_r=N_t=%d$', N_r));
     legend('show', 'location', 'northwest');
     grid on
+    
+    savefig(sprintf('outage_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+    close
 end

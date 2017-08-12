@@ -338,4 +338,7 @@ xlabel('$E_b/N_0$ (dB)');
 ylabel('BER');
 ylim([0.9e-5, 1e0]);
 xticks(SNR_start:SNR_step:SNR_max);
-grid on;
+grid on
+
+savefig(sprintf('BER_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+close
