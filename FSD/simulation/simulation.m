@@ -75,14 +75,16 @@ end
 
 opts = {'no', 'yes'};
 
+config = [sprintf('++++++++++ Configuration ++++++++++\n'), ... 
+sprintf('Transmit antennas: %d, Receive antennas: %d\n', N_t, N_r), ...
+sprintf('ML detection: %s, 4-QAM: %s, 16-QAM: %s\n', ... 
+opts{ml_dec+1}, opts{qam4+1}, opts{qam16+1}), ...
+sprintf('Correlated antennas: %s\n', opts{correlated_antennas+1}), ...
+sprintf('Transmissions: %d, Simulation runs: %d\n', transmissions, runs), ...
+sprintf('SNR: start = %d, step = %d, end = %d\n\n', SNR_start,SNR_step,SNR_max)];
+
 % Print configuration
-fprintf('++++++++++ Configuration ++++++++++\n');
-fprintf('Transmit antennas: %d, Receive antennas: %d\n', N_t, N_r);
-fprintf('ML detection: %s, 4-QAM: %s, 16-QAM: %s\n', ... 
-    opts{ml_dec+1}, opts{qam4+1}, opts{qam16+1});
-fprintf('Correlated antennas: %s\n', opts{correlated_antennas+1});
-fprintf('Transmissions: %d, Simulation runs: %d\n', transmissions, runs);
-fprintf('SNR: start = %d, step = %d, end = %d\n\n', SNR_start,SNR_step,SNR_max);
+fprintf('%s', config);
 
 for SNR = SNR_start:SNR_step:SNR_max
     
@@ -339,6 +341,11 @@ ylabel('BER');
 ylim([0.9e-5, 1e0]);
 xticks(SNR_start:SNR_step:SNR_max);
 grid on
+
+text = uicontrol('style', 'text');
+set(text, 'String', config);
+set(text, 'Units', 'characters');
+set(text, 'Position', [12, 4, 30, 6]);
 
 savefig(sprintf('BER_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
 close
