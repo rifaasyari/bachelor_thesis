@@ -1,0 +1,51 @@
+- Fig. 3 suggests that only real computations were considered although system is complex in general. 
+TODO: Compute Flops for complex system
+
+- BER is very bad for all SNRs. 
+TODO: Check and *evaluate* individual algorithms in the detection. Or is the error located in the simulation script
+(e.g. wrong QPSK constellation)?
+    -> CLLL seems to work correctly (Results in Table I are achieved)
+
+- TODO: "Lattice structure of modulation" -> What is lattice/lattice strcuture?
+    -> DONE
+
+- There is a difference between creating a complex random vector with
+    
+        randn(N_r,1) + 1j*randn(N_r,1)
+  
+  and creating a *circular symmetric complex Gaussian* vector with
+
+        (sqrt(N)*randn(N_r,1)).*exp(1j*2*pi*randn(N_r,1)).
+  
+  The difference becomes appararent in a variance of 2 (first formula) and 
+  a variance of N (second formula)
+    
+    -> ML now gets the paper results!
+
+- Set Noise power N = N_t => var_s >= 1 (but still not always integer)
+    -> BER improvement of 66% !
+
+- Setting scenario 1 with zero mean and unit variance causes ML to decrease 
+  by 100%
+
+- Setting signal power fixed and varying noise power with SNR yields 
+  terrible resutls
+
+- Normalize before Shifting and scaling
+
+- Shifting and Scaling: Is this method valid for QPSK?
+
+- If there are zeros in z_hat then there don't neccessarily have to be zeros in s_l = T * P_l * z_hat. -> Validate!
+
+- Consider permutation matrix P_l in SS since z = P_l' * T^-1 * s !
+
+- Consider SIC for P_l !!!
+
+- Quantization after ML
+
+- Perform simulations for CLLL
+
+- Check "How orthogonal a matrix is"
+
+- SIC: Subtract lattice reduced signal -> Error propagation, possible to 
+    map to lattice reduced symbol constellation?
