@@ -1,4 +1,4 @@
-function numerical_results(K,N_txi,scenario,modulation,runs)
+function numerical_results(K,N_txi,scenario,var_s,modulation,runs)
 % BER performance of MB-LR-SIC algorithm
 
 % +++++++++++++++++++++++++ Begin configuration ++++++++++++++++++++++++++
@@ -26,7 +26,7 @@ channel_estimation = false;  % If false, assume perfectly known channel
 
 % modulation = 'QPSK';  % 'QPSK', '16-QAM'
 
-var_s = 1;  % Signal power
+% var_s = 1;  % Signal power
 
 % runs = 10;
 train_symbols = 50*N_t;  % Number of symbols used for channel estimation
