@@ -5,8 +5,8 @@ function numerical_results_par(K,N_txi,scenario,var_s,modulation,runs,threads)
 %       scenario (int): 
 %           1: I.i.d Gaussian random fading channels with zero mean and unit
 %               variance
-%           2: Realistic propagation conditions with shadowing and path
-%               loss and correlated antennas
+%           2: Realistic propagation conditions with path loss and 
+%               correlated antennas
 %       var_s (int): Signal power
 %       modulation (string): 'QPSK' or '16-QAM'
 %       runs (int): Number of simulation runs per SNR
@@ -21,7 +21,7 @@ N_r = N_t;  % number of total receive antennas
 
 % Parameters for channel scenario 2
 L_p = 0.7;  % Base power path loss
-sigma = 6;  % shadowing spread in dB
+% sigma = 6;  % shadowing spread in dB
 correlation_tx = 0.2;  % correlation index of neighboring transmit antennas
 correlation_rx = correlation_tx;  % correlation index of neighboring receive
                                   % antennas
@@ -68,7 +68,6 @@ R_tx = correlation_tx.^(((0:-1:-(N_t-1))'+(0:N_t-1)).^2);  % Correlation matrix
 R_rx = correlation_rx.^(((0:-1:-(N_r-1))'+(0:N_r-1)).^2);  % Correlation matrix
 % for receive antennas
 alpha_k = sqrt(L_p);
-beta_k = 10.^(sigma*randn(N_r,N_t)/10);
 
 % train_signal = constellation(mod(0:N_t-1,numel(constellation))+1)';  
 % Signal used for channel estimation 
@@ -100,7 +99,10 @@ parfor p = 1:ceil(SNR_max/snr_step)+1, threads
         
         if scenario == 2
             G = sqrtm(R_rx)*H*sqrtm(R_tx);
-            H = alpha_k*beta_k.*G;
+%             beta_k = 10.^(sigma*randn(K,1)/10);
+%             beta_k = repmat(beta_k,1,N_txi)';
+%             beta_k = beta_k(:)';
+            H = alpha_k*G;
         end
         
         BE_mblrsic = 0;  % Bit Errors for MB-LR-SIC detector
