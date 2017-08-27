@@ -7,10 +7,6 @@ function [s_estim] = lr_sic(y, H, var_s, N, modulation, ...
 
     N_t = size(H, 2);  % Total number of transmit antennas is equal to 
                        % number of columns in H
-    N_r = length(y);
-    
-    H_orig = H;
-    y_orig = y;
     
     H = [H;N*eye(N_t)];
     y = [y;zeros(N_t,1)];
@@ -28,7 +24,6 @@ function [s_estim] = lr_sic(y, H, var_s, N, modulation, ...
     P_l = cnbo(H_LR);  % column-norm based ordering in H_LR
 
     H_LR_l = H_LR * P_l;  % Permute channel gain matrix for following SIC
-    T_l = T*P_l;
     
     z_hat = zeros(N_t,1);
     y_l_n = y;
@@ -41,8 +36,6 @@ function [s_estim] = lr_sic(y, H, var_s, N, modulation, ...
         z_l_n = W_l_n * y_l_n; % Output of MMSE detector. Detected 
                                % signal component in reduced lattice 
                                % space                                                
-
-        % addflops(flops_mul(cols(W_l_n), rows(W_l_n), length(y_l_n)));
 
         if use_clll
             % Shifting and Scaling operations 
@@ -61,8 +54,6 @@ function [s_estim] = lr_sic(y, H, var_s, N, modulation, ...
 
         y_l_n = y_l_n - H_LR_l(:,1) * z_hat(n);
         
-        % addflops(2 * length(y_l_n));  
-
         H_LR_l = H_LR_l(:,2:end);  % Update channel gain matrix in LR 
                                    % domain by removing channel gains
                                    % for already estimated signal

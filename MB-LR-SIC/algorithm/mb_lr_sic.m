@@ -33,7 +33,6 @@ function [s_estim] = mb_lr_sic(y, H, var_s, N, modulation, ...
     
     N_t = size(H, 2);  % Total number of transmit antennas is equal to 
                        % number of columns in H
-    N_r = length(y);
     L = N_t;  % Number of permutations of channel gain matrix H
     
     H_orig = H;
@@ -51,8 +50,6 @@ function [s_estim] = mb_lr_sic(y, H, var_s, N, modulation, ...
     end
 
     T_inv = inv(T); 
-
-    % addflops(flops_inv(length(T)));
     
     S = zeros(N_t, L);
     for l = 1:L  % Multi-Branch loop
@@ -64,28 +61,19 @@ function [s_estim] = mb_lr_sic(y, H, var_s, N, modulation, ...
         
         H_LR_l = H_LR * P_l;  % Permute channel gain matrix for following 
                               % SIC
-        % addflops(flops_mul(H_LR, P_l));
-                
+                              
         z_hat = zeros(N_t,1);
         y_l_n = y;
-        
-        % T_l = T*P_l;  % Permuted transformation matrix
-        
-        % R_zz = var_s*inv(ctranspose(T_l)*T_l);
-                                                        
+                                                                
         for n = 1:N_t  % Loop over signal components
                  
             % MMSE linear equalizer
-%             W_l_n = ctranspose(inv(H_LR_l*R_zz*ctranspose(H_LR_l)+N*eye(N_r))*...
-%                 H_LR_l*R_zz);
             W_l_n = inv(H_LR_l'*H_LR_l)*H_LR_l';
                         
             z_l_n = W_l_n * y_l_n; % Output of MMSE detector. Detected 
                                    % signal component in reduced lattice 
                                    % space    
                                                                                    
-            % addflops(flops_mul(cols(W_l_n), rows(W_l_n), length(y_l_n)));
-
             % Shifting and Scaling operations 
             if use_clll
                 z_hat(n) = shifting_scaling(z_l_n(1), 1+1j, P_l'*T_inv, n, ... 
@@ -108,7 +96,6 @@ function [s_estim] = mb_lr_sic(y, H, var_s, N, modulation, ...
                                                      % interference for
                                                      % detection in next
                                                      % iteration
-            % addflops(2 * length(y_l_n));  
             
             H_LR_l = H_LR_l(:,2:end);  % Update channel gain matrix in LR 
                                        % domain by removing channel gains
@@ -131,13 +118,11 @@ function [s_estim] = mb_lr_sic(y, H, var_s, N, modulation, ...
         end
                                                        
         S(:,l) = s_l;
-                                                                          
-        % addflops(flops_mul(T, P_l) + flops_mul(N_t, N_t, 1));
-        
+                                                                                  
     end
                                      
-    Y = repmat(y_orig,1,L);  % Create matrix with L columns of received signal y 
-                        % to quickly calulcate the best estimate of s
+    Y = repmat(y_orig,1,L);  % Create matrix with L columns of received signal 
+                             % y to quickly calulcate the best estimate of s
     ml_arg = Y - H_orig * S;
     [~, l_opt] = min(dot(ml_arg, ml_arg));  % ML decision
     
