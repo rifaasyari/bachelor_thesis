@@ -264,8 +264,8 @@ if ml_detection == true
         'DisplayName', 'ML');
 end
 
-title([sprintf('MU-MIMO System, $N_{txi}$=%d, $N_r$=%d, L=%d Branches, K=%d users ', ...
-    N_txi, N_r, N_t, K), sprintf('and %s modulation', modulation)]);
+title(sprintf('MU-MIMO System, $N_{txi}$=%d, $N_r$=%d, L=%d Branches and K=%d users', ...
+    N_txi, N_r, N_t, K));
 
 xlabel('SNR [dB]');
 xticks(0:snr_step:SNR_max);
@@ -286,5 +286,10 @@ set(textbox, 'Position', [30, 4, 20, 4]);
 savefig(sprintf('BER_%s_%s.fig', ... 
     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
 close
+
+% filename = sprintf('BER_%s_%s.tikz', ... 
+%     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS'));
+% matlab2tikz(filename, ...
+%             'height', '\fheight', 'width', '\fwidth', 'parseStrings', false);
 
 end
