@@ -1,5 +1,15 @@
 function numerical_results(K,N_txi,scenario,var_s,modulation,runs)
 % BER performance of MB-LR-SIC algorithm
+% INPUT K (int): Number of users
+%       N_txi (int): Number of transmit antennas for each user
+%       scenario (int): 
+%           1: I.i.d Gaussian random fading channels with zero mean and unit
+%               variance
+%           2: Realistic propagation conditions with path loss and 
+%               correlated antennas
+%       var_s (int): Signal power
+%       modulation (string): 'QPSK' or '16-QAM'
+%       runs (int): Number of simulation runs per SNR
 
 % +++++++++++++++++++++++++ Begin configuration ++++++++++++++++++++++++++
 
@@ -288,5 +298,11 @@ set(textbox, 'Position', [30, 4, 20, 4]);
 savefig(sprintf('BER_%s_%s.fig', ... 
     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
 close
+
+% filename = sprintf('BER_%s_%s.tikz', ... 
+%     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS'));
+% matlab2tikz(filename, ...
+%             'height', '\fheight', 'width', '\fwidth', 'parseStrings', false);
+
 
 end
