@@ -202,25 +202,25 @@ for SNR = 0:snr_step:SNR_max
         BERs_lrmmse(i) = BE_lrmmse / (transmitted_symbols * N_t * ... 
             log2(numel(constellation)));
         
-        if mblrsic_dec == true
-            fprintf('%d MB-LR-SIC, BER: %.4f\n', ... 
-                i, BERs_mblrsic(i));
-        end
-        if lr_sic_dec == true
-            fprintf('%d LR-SIC, BER: %.4f\n', i, BERs_lrsic(i));
-        end
-        if mbsic_dec == true
-            fprintf('%d MB-SIC, BER: %.4f\n', i, BERs_mbsic(i));
-        end
-        if sic_dec == true
-            fprintf('%d SIC, BER: %.4f\n', i, BERs_sic(i));
-        end
-        if lr_mmse_dec == true
-            fprintf('%d LR-MMSE, BER: %.4f\n', i, BERs_lrmmse(i));
-        end
-        if ml_detection == true
-            fprintf('%d ML, BER: %.4f\n\n', i, BERs_ml(i));
-        end
+%         if mblrsic_dec == true
+%             fprintf('%d MB-LR-SIC, BER: %.4f\n', ... 
+%                 i, BERs_mblrsic(i));
+%         end
+%         if lr_sic_dec == true
+%             fprintf('%d LR-SIC, BER: %.4f\n', i, BERs_lrsic(i));
+%         end
+%         if mbsic_dec == true
+%             fprintf('%d MB-SIC, BER: %.4f\n', i, BERs_mbsic(i));
+%         end
+%         if sic_dec == true
+%             fprintf('%d SIC, BER: %.4f\n', i, BERs_sic(i));
+%         end
+%         if lr_mmse_dec == true
+%             fprintf('%d LR-MMSE, BER: %.4f\n', i, BERs_lrmmse(i));
+%         end
+%         if ml_detection == true
+%             fprintf('%d ML, BER: %.4f\n\n', i, BERs_ml(i));
+%         end
         
     end
     BER_mblrsic(SNR/snr_step+1) = mean(BERs_mblrsic);
