@@ -56,6 +56,9 @@ lr_mmse_dec = false;
 assert(N_r >= N_t);  % Make sure to use no less receive than transmit 
                      % antennas 
                      
+ start_time = datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS');
+ fprintf('\nStarted at %s\n\n', start_time);
+                     
 if strcmp(modulation, '16-QAM')
     % var_s = 10;
     decode = @decode_16QAM;
@@ -69,8 +72,6 @@ elseif strcmp(modulation, 'QPSK')
 else
     error('Invalid modulation %s', modulation);
 end
-
-disp(constellation);
                      
 if channel_estimation == true
     transmitted_symbols = transmitted_symbols + train_symbols;
@@ -223,9 +224,11 @@ for SNR = 0:snr_step:SNR_max
 %         end
         
     end
+    
+    fprintf('%s\n', datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS'));
     BER_mblrsic(SNR/snr_step+1) = mean(BERs_mblrsic);
     if mblrsic_dec == true
-        fprintf('SNR = %d, BER MB-LR-SIC: %.4f\n\n', ... 
+        fprintf('SNR = %d, BER MB-LR-SIC: %.4f\n', ... 
             SNR, BER_mblrsic(SNR/snr_step+1));
     end
     BER_mbsic(SNR/snr_step+1) = mean(BERs_mbsic);
@@ -295,14 +298,17 @@ set(textbox, 'String', annot);
 set(textbox, 'Units', 'characters');
 set(textbox, 'Position', [30, 4, 20, 4]);
 
-savefig(sprintf('BER_%s_%s.fig', ... 
-    modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
-close
+% savefig(sprintf('BER_%s_%s.fig', ... 
+%     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+% close
 
 % filename = sprintf('BER_%s_%s.tikz', ... 
 %     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS'));
 % matlab2tikz(filename, ...
 %             'height', '\fheight', 'width', '\fwidth', 'parseStrings', false);
 
+
+end_time = datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS');
+fprintf('Ended at %s\n\n', end_time);
 
 end
