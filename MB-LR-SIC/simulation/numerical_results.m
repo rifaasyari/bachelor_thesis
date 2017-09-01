@@ -298,9 +298,9 @@ set(textbox, 'String', annot);
 set(textbox, 'Units', 'characters');
 set(textbox, 'Position', [30, 4, 20, 4]);
 
-% savefig(sprintf('BER_%s_%s.fig', ... 
-%     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
-% close
+savefig(sprintf('BER_%s_%s.fig', ... 
+    modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+close
 
 % filename = sprintf('BER_%s_%s.tikz', ... 
 %     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS'));
