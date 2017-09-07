@@ -40,7 +40,7 @@ function [s_estim] = mb_lr_sic(y, H, var_s, N, modulation, ...
     y_orig = y;
     
     if extended
-        H = [H;N*eye(N_t)];
+        H = [H;sqrt(N)*eye(N_t)];
         y = [y;zeros(N_t,1)];
     end
     

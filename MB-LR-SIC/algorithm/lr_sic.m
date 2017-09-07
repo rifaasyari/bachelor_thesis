@@ -17,7 +17,7 @@ function [s_estim] = lr_sic(y, H, var_s, N, modulation, ...
     end
          
     if extended
-        H = [H;N*eye(N_t)];
+        H = [H;sqrt(N)*eye(N_t)];
         y = [y;zeros(N_t,1)];
     end
     
