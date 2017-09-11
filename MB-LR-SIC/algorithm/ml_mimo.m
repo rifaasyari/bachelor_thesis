@@ -1,4 +1,4 @@
-function [s_estim] = ml_mimo(y, H, constellation)
+function [s_estim] = ml_mimo(y, H, constellation, Possbl_s)
 % ML_MIMO Implements the ML detection for MIMO systems
 %   Input
 %       y: Received signal
@@ -17,7 +17,7 @@ function [s_estim] = ml_mimo(y, H, constellation)
     % Copyright (c) 2013, Adrian Etter
     % Copyright (c) 2006, Matt Fig
     % All rights reserved.
-    Possbl_s = npermutek(constellation, N_t)';  % Generate all possible sent 
+    % Possbl_s = npermutek(constellation, N_t)';  % Generate all possible sent 
                                                 % signals for ML detection.
                                                 % length(constellation)^N_t
                                                 % permutations.

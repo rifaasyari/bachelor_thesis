@@ -62,6 +62,10 @@ else
     error('Invalid modulation %s', modulation);
 end
 
+if ml_detection
+    ml_tree = npermutek(constellation,N_t)';
+end
+
 R_tx = correlation_tx.^(((0:-1:-(N_t-1))'+(0:N_t-1)).^2);  % Correlation matrix
 % for transmit antennas
 R_rx = correlation_rx.^(((0:-1:-(N_r-1))'+(0:N_r-1)).^2);  % Correlation matrix
@@ -147,7 +151,7 @@ for SNR = 0:snr_step:SNR_max
             end
 
             if ml_detection == true
-                s_ml = ml_mimo(y,H,constellation);
+                s_ml = ml_mimo(y,H,constellation,ml_tree);
                 b_ml = decode(s_ml, constellation);
                 BE_ml = BE_ml + sum(b ~= b_ml);
             end
@@ -262,15 +266,14 @@ set(textbox, 'String', annot);
 set(textbox, 'Units', 'characters');
 set(textbox, 'Position', [30, 4, 20, 4]);
 
-savefig(sprintf('BER_%s_%s.fig', ... 
-    modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
-close
-
 % filename = sprintf('BER_%s_%s.tikz', ... 
 %     modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS'));
 % matlab2tikz(filename, ...
 %             'height', '\fheight', 'width', '\fwidth', 'parseStrings', false);
 
+savefig(sprintf('BER_%s_%s.fig', ... 
+    modulation, datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+close
 
 end_time = datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS');
 fprintf('Ended at %s\n\n', end_time);
