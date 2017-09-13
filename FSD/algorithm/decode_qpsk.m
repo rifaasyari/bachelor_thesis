@@ -9,22 +9,18 @@ function [b] = decode_qpsk(s, ~)
 
     b = zeros(1, 2*length(s));
     for k = 1:length(s)
-        if abs(s(k)) == 0  % s(k) = 0 + 0j
-            b(k:k+1) = randi([0,1], 1, 2);  % Random bits
-            % fprintf('Guessing random bits...\n');
+        pos = (k-1) * 2 + 1;
+        if real(s(k)) > 0 && imag(s(k)) > 0
+            b(pos:pos+1) = [0 0];
+        elseif real(s(k)) < 0 && imag(s(k)) > 0
+            b(pos:pos+1) = [0 1];
+        elseif real(s(k)) < 0 && imag(s(k)) < 0
+            b(pos:pos+1) = [1 1];
+        elseif real(s(k)) > 0 && imag(s(k)) < 0
+            b(pos:pos+1) = [1 0];
         else
-            if real(s(k)) >= 0 && imag(s(k)) >= 0
-                b(k:k+1) = [0 0];
-            elseif real(s(k)) <= 0 && imag(s(k)) >= 0
-                b(k:k+1) = [0 1];
-            elseif real(s(k)) <= 0 && imag(s(k)) <= 0
-                b(k:k+1) = [1 1];
-            elseif real(s(k)) >= 0 && imag(s(k)) <= 0
-                b(k:k+1) = [1 0];
-            else
-                disp(s(k));
-                error('Invalid symbol');
-            end
+            disp(s(k));
+            error('Invalid symbol');
         end
     end
 

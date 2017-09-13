@@ -1,5 +1,5 @@
 function [S_ml, R, E_n, visit_children, full_paths, visited] = ... 
-    sd(y,H,i,constellation,R,P_prev,S_ml,E_n, visit_children, s)
+    sd(y,H,i,constellation,R,P_prev,S_ml,E_n,visit_children,s,U,s_hat)
 % SD Implementing the complex version of the Sphere Decoder for MIMO
 %   detection. Achieves quasi-ML performance under variable complexity.
 %
@@ -17,13 +17,26 @@ function [S_ml, R, E_n, visit_children, full_paths, visited] = ...
 %        full_paths: Number of paths visited to the leaf nodes
 %        visited: Number of paths which were not fully visited
 
+    constellation = constellation(:);  % Store constellation in a vector 
+                                       % instead of a matrix
+
     % Tree setup
     N_t = size(H,2);
-
-    [~, U] = qr(H);
-    s_hat = inv(ctranspose(H)*H)*ctranspose(H)*y;  % Babai point
-        
+    N_r = size(H,1);
+    
     if i == N_t
+        
+        addflops(2);
+        
+        [~, U] = qr(H);
+    
+        addflops(flops_chol(N_t));
+
+        s_hat = inv(ctranspose(H)*H)*ctranspose(H)*y;  % Babai point
+
+        addflops(6*flops_mul(N_t,N_r,N_t) + flops_inv(N_t) + ... 
+            6*flops_mul(N_t,N_t,N_r) + flops_mul(N_t,N_r,1));
+        
         E_n = zeros(N_t,1);  % Average number of nodes per level 
         visit_children = [zeros(N_t-1,1);1];  % How many parent nodes visit 
         % at least one child node?
@@ -45,15 +58,24 @@ function [S_ml, R, E_n, visit_children, full_paths, visited] = ...
         if i == N_t
             P_i = abs((s_i-s_hat(N_t)))^2*U(N_t,N_t)^2;  
             % Path metric on level i=N_t
+            
+            addflops(2 + flops_abs() + flops_pow(2) + 1 + flops_pow(2));
         else
             P_i = abs(U(i,i:end)*([s_i;s(i+1:end)]-s_hat(i:end)))^2 ... 
                 + P_prev;  
             % Path metric on level i < N_t 
+            
+            addflops(2*(N_t-i+1) + 2*flops_mul(1,N_t-i+1,1) + flops_abs() + ...
+                flops_pow(2) + 1);
         end
+        addflops(2);
         
         if P_i <= R^2  % Path lies inside the hypersphere
             s(i) = s_i;
             E_n(i) = E_n(i) + 1;
+            
+            addflops(3);
+            
             if i < N_t && first_child
                 visit_children(i) = visit_children(i) + 1;
                 first_child = false;
@@ -64,9 +86,11 @@ function [S_ml, R, E_n, visit_children, full_paths, visited] = ...
                 % R = norm(U*(S_ml(:,col)-s_hat));
                 S_ml{end+1} = s;
                 R = sqrt(P_i);
+                addflops(2);
             else
                 [S_ml, R, E_n, visit_children] = ... 
-                    sd(y,H,i-1,constellation,R,P_i,S_ml,E_n,visit_children,s);
+                    sd(y,H,i-1,constellation,R,P_i,S_ml,E_n,...
+                    visit_children,s,U,s_hat);
                 % Recursively visiting all child nodes, thus realizing 
                 % depth-first search
             end
@@ -75,6 +99,7 @@ function [S_ml, R, E_n, visit_children, full_paths, visited] = ...
     
     if i < N_t
         % All children visited. Go back to i+1, i.e. one level up
+        addflops(2);
         return
     else
         % Return ML solution

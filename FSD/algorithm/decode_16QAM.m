@@ -19,12 +19,13 @@ function [b] = decode_16QAM(s, mod)
 %       mod (matrix): 16-QAM symbol constellation generated from
 %           CREATE_16_QAM
 % 
-% OUTPUT b (scalar or vector): Bit sequence of symbols s of double length
+% OUTPUT b (scalar or vector): Bit sequence of symbols s of four times length
 %
 % See also DECODE_QPSK
 
     b = zeros(1, 4*length(s));
     for k = 1:length(s)
+        pos = (k-1) * 4 + 1;
         S = repmat(s(k), size(mod));
         ml = abs(mod-S).^2;
         [~, min_rows] = min(ml);
@@ -34,46 +35,46 @@ function [b] = decode_16QAM(s, mod)
             case 1
                 switch min_col
                     case 1
-                        b(k:k+3) = [1 0 1 1];
+                        b(pos:pos+3) = [1 0 1 1];
                     case 2
-                        b(k:k+3) = [1 0 1 0];
+                        b(pos:pos+3) = [1 0 1 0];
                     case 3
-                        b(k:k+3) = [0 0 1 0];
+                        b(pos:pos+3) = [0 0 1 0];
                     case 4
-                        b(k:k+3) = [0 0 1 1];
+                        b(pos:pos+3) = [0 0 1 1];
                 end
             case 2
                 switch min_col
                     case 1
-                        b(k:k+3) = [1 0 0 1];
+                        b(pos:pos+3) = [1 0 0 1];
                     case 2
-                        b(k:k+3) = [1 0 0 0];
+                        b(pos:pos+3) = [1 0 0 0];
                     case 3
-                        b(k:k+3) = [0 0 0 0];
+                        b(pos:pos+3) = [0 0 0 0];
                     case 4
-                        b(k:k+3) = [0 0 0 1];
+                        b(pos:pos+3) = [0 0 0 1];
                 end
             case 3
                 switch min_col
                     case 1
-                        b(k:k+3) = [1 1 0 1];
+                        b(pos:pos+3) = [1 1 0 1];
                     case 2
-                        b(k:k+3) = [1 1 0 0];
+                        b(pos:pos+3) = [1 1 0 0];
                     case 3
-                        b(k:k+3) = [0 1 0 0];
+                        b(pos:pos+3) = [0 1 0 0];
                     case 4
-                        b(k:k+3) = [0 1 0 1];
+                        b(pos:pos+3) = [0 1 0 1];
                 end
             case 4
                 switch min_col
                     case 1
-                        b(k:k+3) = [1 1 1 1];
+                        b(pos:pos+3) = [1 1 1 1];
                     case 2
-                        b(k:k+3) = [1 1 1 0];
+                        b(pos:pos+3) = [1 1 1 0];
                     case 3
-                        b(k:k+3) = [0 1 1 0];
+                        b(pos:pos+3) = [0 1 1 0];
                     case 4
-                        b(k:k+3) = [0 1 1 1];
+                        b(pos:pos+3) = [0 1 1 1];
                 end
         end
     end

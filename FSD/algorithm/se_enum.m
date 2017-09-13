@@ -19,6 +19,9 @@ function nodes = se_enum(s_hat,s,U,i,nodes)
     % Accumulated squared euclidean distance
     P_i = abs(U(i,i:end)*(S(i:end,:)-S_hat(i:end,:))).^2;
     
+%     addflops(2*numel(S(i:end,:)) + flops_mul(U(i,i:end),S(i:end,:)) + ...
+%         flops_abs() * numel(nodes) + numel(nodes)*flops_pow(2));
+    
     % Sort according to increasing euclidean distance 
     [~, order] = sort(P_i, 'ascend');
     nodes = nodes(order)';
