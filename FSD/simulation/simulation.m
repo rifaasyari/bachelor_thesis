@@ -27,6 +27,9 @@ SNR_step = 2;
 
 % +++++++++++++++++++ End configuration ++++++++++++++++++++++++++++
 
+start_time = datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS');
+ fprintf('\nStarted at %s\n\n', start_time);
+
 if qam4 == true
     constellation_4 = create_MQAM(4,E_s);
     decode_4 = @decode_qpsk;
@@ -220,19 +223,15 @@ for SNR = SNR_start:SNR_step:SNR_max
         if qam4 == true
             BERs_sd_4(i) = BE_sd_4 / (transmissions * N_t * ...
                 log2(numel(constellation_4)));
-            fprintf('%d) SNR=%d, 4-QAM, BER SD: %.4f\n', i, SNR, BERs_sd_4(i));
             BERs_fsd_4(i) = BE_fsd_4 / (transmissions * N_t * ...
                 log2(numel(constellation_4)));
-            fprintf('%d) SNR=%d, 4-QAM, BER FSD: %.4f\n', i, SNR, BERs_fsd_4(i));
         end
         
         if qam16 == true  && ~correlated_antennas
             BERs_sd_16(i) = BE_sd_16 / (transmissions * N_t * ...
                 log2(numel(constellation_16)));
-            fprintf('%d) SNR=%d, 16-QAM, BER SD: %.4f\n', i, SNR, BERs_sd_16(i));
             BERs_fsd_16(i) = BE_fsd_16 / (transmissions * N_t * ...
                 log2(numel(constellation_16)));
-            fprintf('%d) SNR=%d, 16-QAM, BER FSD: %.4f\n', i, SNR, BERs_fsd_16(i));
         elseif correlated_antennas
             BERs_sd(i) = BE_sd / (transmissions * N_t * ...
                 log2(numel(constellation_16)));
@@ -248,7 +247,6 @@ for SNR = SNR_start:SNR_step:SNR_max
                 log2(numel(constellation_16)));
             BERs_fsd_high(i) = BE_fsd_high / (transmissions * N_t * ...
                 log2(numel(constellation_16)));
-            fprintf('SNR: %d, Pass: %d\n', SNR, i);
         end
         
         if ml_dec == true
@@ -259,7 +257,6 @@ for SNR = SNR_start:SNR_step:SNR_max
                 BERs_ml(i) = BE_ml / (transmissions * N_t * ...
                     log2(numel(constellation_16)));
             end
-            fprintf('%d) BER ML: %.4f\n', i, BERs_ml(i));
         end
         
     end
@@ -282,6 +279,9 @@ for SNR = SNR_start:SNR_step:SNR_max
     if ml_dec == true
         BER_ml((SNR-SNR_start)/SNR_step+1) = mean(BERs_ml);
     end
+    
+    fprintf('%s\n', datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS'));
+    fprintf('SNR: %d passed\n\n',SNR);
 end
 
 x_axis = SNR_start:SNR_step:SNR_max;
@@ -358,5 +358,8 @@ set(text, 'String', config);
 set(text, 'Units', 'characters');
 set(text, 'Position', [12, 4, 30, 6]);
 
-% savefig(sprintf('BER_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
-% close
+savefig(sprintf('BER_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+close
+
+end_time = datestr(datetime('now'), 'dd.mm.yyyy HH:MM:SS');
+fprintf('Ended at %s\n\n', end_time);
