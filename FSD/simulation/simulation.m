@@ -7,8 +7,8 @@ clc
 
 % +++++++++++++++++++ Begin configuration +++++++++++++++++++++++++++++
 
-N_r = 8;  % Receive antennas
-N_t = 8;  % Transmit antennas 
+N_r = 4;  % Receive antennas
+N_t = 4;  % Transmit antennas 
 
 correlated_antennas = false;  % Consider spatial correlation in the channel
 
@@ -16,27 +16,27 @@ ml_dec = false && ~correlated_antennas;  % Use ML detector
 qam4 = true && ~correlated_antennas;  % Apply 4-QAM modulation
 qam16 = true || correlated_antennas;  % Apply 16-QAM modulation
 
+E_s = 1/N_t;
+
 transmissions = 200;  % Transmissions per channel scenario
-runs = 50;  % Channel scenarios per SNR
+runs = 100;  % Channel scenarios per SNR
 
 SNR_start = 0;
 SNR_max = 20;  % SNR per bit defined as log2(P)^-1/N_0
-SNR_step = 4;
+SNR_step = 2;
 
 % +++++++++++++++++++ End configuration ++++++++++++++++++++++++++++
-
-E_s = 1/N_t;
 
 if qam4 == true
     constellation_4 = create_MQAM(4,E_s);
     decode_4 = @decode_qpsk;
-    constellation_4 = constellation_4(:);
+    % constellation_4 = constellation_4(:);
     P_4 = numel(constellation_4);
 end
 if qam16 == true
     constellation_16 = create_16_QAM(E_s);
     decode_16 = @decode_16QAM;
-    constellation_16 = constellation_16(:);
+    % constellation_16 = constellation_16(:);
     P_16 = numel(constellation_16);
 end
 
@@ -144,12 +144,12 @@ for SNR = SNR_start:SNR_step:SNR_max
         for j = 1:transmissions  % transmitted symbols
             
             if qam4 == true
-                s_4 = constellation_4(randi([1,numel(constellation_4)], 1, N_t)); 
+                s_4 = constellation_4(randi([1,numel(constellation_4)], 1, N_t))'; 
                 n_4 = sqrt(N_0_4/2) * (randn(N_r,1) + 1j*randn(N_r,1));
                 y_4 = H*s_4+n_4;
             end
             if qam16 == true
-                s_16 = constellation_16(randi([1,numel(constellation_16)], 1, N_t)); 
+                s_16 = constellation_16(randi([1,numel(constellation_16)], 1, N_t))'; 
                 n_16 = sqrt(N_0_16/2) * (randn(N_r,1) + 1j*randn(N_r,1));
                 y_16 = H*s_16+n_16;
                 
@@ -204,9 +204,15 @@ for SNR = SNR_start:SNR_step:SNR_max
                 end
             end
             if ml_dec == true
-                [s_ml,err] = ml_mimo(y_4,H,constellation_4);
-                b_ml = decode_4(s_ml,constellation_4);
-                BE_ml = BE_ml + sum(b_ml ~= b_4);
+                if qam4 == true
+                    [s_ml,err] = ml_mimo(y_4,H,constellation_4);
+                    b_ml = decode_4(s_ml,constellation_4);
+                    BE_ml = BE_ml + sum(b_ml ~= b_4);
+                elseif qam16 == true
+                    s_ml = ml_mimo(y_16,H,constellation_16);
+                    b_ml = decode_16(s_ml,constellation_16);
+                    BE_ml = BE_ml + sum(b_ml ~= b_16);
+                end
             end 
         
         end
@@ -246,8 +252,13 @@ for SNR = SNR_start:SNR_step:SNR_max
         end
         
         if ml_dec == true
-            BERs_ml(i) = BE_ml / (transmissions * N_t * ... 
-                log2(numel(constellation_4)));
+            if qam4 == true
+                BERs_ml(i) = BE_ml / (transmissions * N_t * ... 
+                    log2(numel(constellation_4)));
+            elseif qam16 == true
+                BERs_ml(i) = BE_ml / (transmissions * N_t * ...
+                    log2(numel(constellation_16)));
+            end
             fprintf('%d) BER ML: %.4f\n', i, BERs_ml(i));
         end
         
@@ -297,10 +308,10 @@ if ~correlated_antennas
 
     if qam16 == true
         hold on
-        semilogy(x_axis, BER_sd_16, 'k--^', ...
+        semilogy(x_axis, BER_sd_16, 'b--^', ...
             'LineWidth', 1);
         hold on
-        semilogy(x_axis, BER_fsd_16, 'k-s', ...
+        semilogy(x_axis, BER_fsd_16, 'b-s', ...
             'LineWidth', 1);
     end
 
@@ -347,5 +358,5 @@ set(text, 'String', config);
 set(text, 'Units', 'characters');
 set(text, 'Position', [12, 4, 30, 6]);
 
-savefig(sprintf('BER_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
-close
+% savefig(sprintf('BER_%s.fig', datestr(datetime('now'), 'dd-mm-yyyy_HH-MM-SS')));
+% close
